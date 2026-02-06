@@ -23,7 +23,13 @@ export interface QuizState {
   score: number;
 }
 
-export type ViewState = 'HOME' | 'CHAPTERS' | 'QUIZ' | 'RESULTS';
+export type ViewState =
+  | 'HOME'
+  | 'CHAPTERS'
+  | 'CHAPTER_OPTIONS'
+  | 'QUIZ'
+  | 'RESULTS';
+
 
 export interface AIConfig {
   isLoading: boolean;
