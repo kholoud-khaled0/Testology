@@ -328,22 +328,22 @@ export default function App() {
     });
     setView("QUIZ");
   };
- const startChapterExam = (chapter: Chapter) => {
-  if (!chapter.exam) return;
+  const startChapterExam = (chapter: Chapter) => {
+    if (!chapter.exam) return;
 
-  setIsExamMode(true); // ✅ تايمر يشتغل في الاتنين
-  setActiveChapter(chapter.exam);
-  setCurrentQuestions(chapter.exam.questions);
+    setIsExamMode(true); // ✅ تايمر يشتغل في الاتنين
+    setActiveChapter(chapter.exam);
+    setCurrentQuestions(chapter.exam.questions);
 
-  setQuizState({
-    answers: new Array(chapter.exam.questions.length).fill(null),
-    isSubmitted: false,
-    score: 0,
-  });
+    setQuizState({
+      answers: new Array(chapter.exam.questions.length).fill(null),
+      isSubmitted: false,
+      score: 0,
+    });
 
-  setTimeLeft(EXAM_DURATION);
-  setView("QUIZ");
-};
+    setTimeLeft(EXAM_DURATION);
+    setView("QUIZ");
+  };
 
   const handleGenerateAI = async () => {
     setAiConfig({ isLoading: true, error: null });
@@ -388,7 +388,6 @@ export default function App() {
 
     const percentage = (score / currentQuestions.length) * 100;
     const isFinalExam = isExamMode;
-
 
     setQuizState({ ...quizState, isSubmitted: true, score });
     setView("RESULTS");
@@ -500,15 +499,14 @@ export default function App() {
             {PRACTICE_CHAPTERS.map((chapter, index) => (
               <div
                 key={chapter.id}
-onClick={() => {
-  if (chapter.id === "GenAI-MockExam") {
-    startChapterExam(chapter); // ✅ Exam Mode + Timer
-  } else {
-    setActiveChapter(chapter);
-    setView("CHAPTER_OPTIONS");
-  }
-}}
-
+                onClick={() => {
+                  if (chapter.id === "GenAI-Mock-exam") {
+                    startChapterExam(chapter); // ✅ Exam Mode + Timer
+                  } else {
+                    setActiveChapter(chapter);
+                    setView("CHAPTER_OPTIONS");
+                  }
+                }}
                 className={`
                               px-6 py-5 rounded-2xl backdrop-blur-md
                               cursor-pointer transition-all duration-300 w-full
@@ -527,7 +525,7 @@ onClick={() => {
                               }
                               hover:scale-[1.02]
                         
-                          `}
+                            `}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow">
