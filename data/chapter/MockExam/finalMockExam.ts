@@ -1,7 +1,7 @@
 import { Chapter } from "../types";
 
 export const FINAL_EXAM: Chapter = {
-  id: "GenAI-MockExam",
+  id: "GenAI-Mock-exam",
   title: "Mock Exam on All Chapters",
   description: "40 Questions • 60 Minutes • Mock Exam on GenAI Certificate",
   icon: "Network",
