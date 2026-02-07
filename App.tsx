@@ -94,7 +94,7 @@ const Header: React.FC<{
         />
         <span className="font-bold text-base">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-            <span className="text-2xl align-baseline">T</span>
+            <span className="text-xl align-baseline">T</span>
             est
           </span>
           <span className="text-slate-800">ology</span>
@@ -826,7 +826,10 @@ export default function App() {
         <img
           src="/assets/halfRobot.png"
           alt="AI Robot"
-          className="absolute right-8 top-20 w-40 z-20 pointer-events-none"
+          className="
+          fixed right-8 top-1/2 translate-y-8
+          w-40 lg:w-48 xl:w-56
+          z-20 pointer-events-none"
         />
 
         <div className="max-w-4xl mx-auto px-6 pt-14 pb-32 space-y-10">
