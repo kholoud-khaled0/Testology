@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PRACTICE_CHAPTERS } from "./data/chapter/chapters";
-import { Youtube, Linkedin, Facebook, MessageCircle } from "lucide-react";
+import { FaYoutube, FaLinkedin, FaFacebook, FaWhatsapp } from "react-icons/fa";
 import {
   BrainCircuit,
   MessageSquareText,
@@ -94,10 +94,8 @@ const Header: React.FC<{
         />
         <span className="font-bold text-base">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-            <span className="text-xl align-baseline">T</span>
-            est
+            <span className="text-2xl font-bold text-black">TestologyAI</span>
           </span>
-          <span className="text-slate-800">ology</span>
         </span>
       </div>
 
@@ -105,7 +103,7 @@ const Header: React.FC<{
       <nav className="hidden md:flex items-center gap-6 text-sm">
         <span
           onClick={onHome}
-          className={`cursor-pointer ${
+          className={`cursor-pointer text-2xl font-bold ${
             currentView === "HOME"
               ? "text-indigo-600 font-medium"
               : "text-slate-500 hover:text-indigo-600"
@@ -116,7 +114,7 @@ const Header: React.FC<{
 
         <span
           onClick={onChapters}
-          className={`cursor-pointer ${
+          className={`cursor-pointer text-2xl font-bold ${
             currentView === "CHAPTERS"
               ? "text-indigo-600 font-medium"
               : "text-slate-500 hover:text-indigo-600"
@@ -137,7 +135,7 @@ const Header: React.FC<{
       {/* Avatar */}
       <img
         src="/assets/omar.jpg"
-        className="w-8 h-8 rounded-full object-cover border"
+        className="w-12 h-12 rounded-full object-cover border"
       />
     </div>
   </header>
@@ -145,24 +143,16 @@ const Header: React.FC<{
 const Footer = () => {
   return (
     <footer className="border-t border-slate-200 bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Brand صغير */}
-        <div className="text-sm font-semibold">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-            Test
-          </span>
-          <span className="text-slate-800">ology</span>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-center">
         {/* Icons */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-8">
           <a
             href="https://youtube.com/@testologygeeks?si=G00dkV08idhW44vD"
             target="_blank"
             rel="noopener noreferrer"
             className="text-slate-500 hover:text-red-600 transition"
           >
-            <Youtube className="w-5 h-5" />
+            <FaYoutube className="w-7 h-7 text-red-600 hover:text-red-700" />
           </a>
 
           <a
@@ -171,7 +161,7 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="text-slate-500 hover:text-blue-600 transition"
           >
-            <Linkedin className="w-5 h-5" />
+            <FaLinkedin className="w-7 h-7 text-blue-700 hover:text-blue-800" />
           </a>
 
           <a
@@ -180,7 +170,7 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="text-slate-500 hover:text-blue-700 transition"
           >
-            <Facebook className="w-5 h-5" />
+            <FaFacebook className="w-7 h-7 text-blue-600 hover:text-blue-700" />
           </a>
 
           <a
@@ -189,7 +179,7 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="text-slate-500 hover:text-green-600 transition"
           >
-            <MessageCircle className="w-5 h-5" />
+            <FaWhatsapp className="w-7 h-7 text-green-500 hover:text-green-600" />
           </a>
         </div>
       </div>
