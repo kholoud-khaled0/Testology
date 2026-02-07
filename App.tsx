@@ -498,25 +498,32 @@ export default function App() {
               <div
                 key={chapter.id}
                 onClick={() => {
-                  setActiveChapter(chapter);
-                  setView("CHAPTER_OPTIONS");
+                  if (chapter.exam && !chapter.questions?.length) {
+                    startChapterExam(chapter);
+                  } else {
+                    setActiveChapter(chapter);
+                    setView("CHAPTER_OPTIONS");
+                  }
                 }}
                 className={`
-      px-6 py-5 rounded-2xl backdrop-blur-md
-      cursor-pointer transition-all duration-300 w-full
-      ${
-        index === 1
-          ? "bg-[#FFF4D6]"
-          : index === 2
-          ? "bg-[#EAF6FF]"
-          : index === 3
-          ? "bg-[#FFEAEA]"
-          : index === 4
-          ? "bg-[#F3EDFF]"
-          : "bg-white/90"
-      }
-      hover:scale-[1.02]
-    `}
+                              px-6 py-5 rounded-2xl backdrop-blur-md
+                              cursor-pointer transition-all duration-300 w-full
+                              ${
+                                index === 1
+                                  ? "bg-[#FFF4D6]"
+                                  : index === 2
+                                  ? "bg-[#EAF6FF]"
+                                  : index === 3
+                                  ? "bg-[#FFEAEA]"
+                                  : index === 4
+                                  ? "bg-[#F3EDFF]"
+                                  : index === 5
+                                  ? "bg-[#E6FFFA]"
+                                  : "bg-white/90"
+                              }
+                              hover:scale-[1.02]
+                        
+                          `}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow">
