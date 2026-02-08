@@ -2,7 +2,7 @@ import { Chapter } from "../types";
 
 export const CHAPTER_1_PRACTICE: Chapter = {
   id: "genai-1",
-  title: "GenAI Fundamentals",
+  title: "Introduction to Generative AI for Software Testing",
   description: "Fundamentals of Generative AI, LLMs, and their applications in testing",
   icon: "BrainCircuit",
   questions: [

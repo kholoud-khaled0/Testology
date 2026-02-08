@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { PRACTICE_CHAPTERS } from "./data/chapter/chapters";
 import { FaYoutube, FaLinkedin, FaFacebook, FaWhatsapp } from "react-icons/fa";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   BrainCircuit,
   MessageSquareText,
@@ -126,10 +128,18 @@ const Header: React.FC<{
 
 
       {/* Avatar */}
-      <img
-        src="/assets/omar.jpg"
-        className="w-12 h-12 rounded-full object-cover border"
-      />
+      <a
+  href="https://www.linkedin.com/in/omar-zidan-%F0%9F%8D%89-56b851108"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img
+    src="/assets/omar.jpg"
+    className="w-12 h-12 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+    alt="Omar LinkedIn"
+  />
+</a>
+
     </div>
   </header>
 );
@@ -237,12 +247,76 @@ const Celebration = () => {
     </div>
   );
 };
+const ChapterOptionsPage = ({
+  startChapter,
+  startChapterExam,
+}: {
+  startChapter: (chapter: Chapter) => void;
+  startChapterExam: (chapter: Chapter) => void;
+}) => {
+  const { chapterId } = useParams();
+  const navigate = useNavigate();
 
+  const chapter =
+    PRACTICE_CHAPTERS.find((c) => c.id === chapterId) || null;
+
+  if (!chapter) {
+    navigate("/chapters", { replace: true });
+    return null;
+  }
+
+  return (
+    <section
+      className="min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/assets/backGround.png')" }}
+    >
+      <div className="max-w-5xl mx-auto px-6 pt-20 pb-24">
+        <h2 className="text-4xl font-bold text-slate-900 mb-3 text-center">
+          {chapter.title}
+        </h2>
+
+        <p className="text-slate-500 text-center mb-16">
+          Choose how you want to start this chapter
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-10">
+          <Card
+            hoverable
+            onClick={() => startChapter(chapter)}
+            className="text-center py-16"
+          >
+            <Bot className="w-12 h-12 text-indigo-600 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold mb-3">Practice Mode</h3>
+            <p className="text-slate-500 mb-8">
+              Learn step by step with practice questions.
+            </p>
+            <Button className="w-full justify-center">Start Practice</Button>
+          </Card>
+
+          {chapter.exam && (
+            <Card
+              hoverable
+              onClick={() => startChapterExam(chapter)}
+              className="text-center py-16"
+            >
+              <Award className="w-12 h-12 text-indigo-600 mx-auto mb-6" />
+              <h3 className="text-2xl font-bold mb-3">Exam Mode</h3>
+              <p className="text-slate-500 mb-8">
+                Simulate the real certification exam.
+              </p>
+              <Button className="w-full justify-center">Start Exam</Button>
+            </Card>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
 export default function App() {
   const [view, setView] = useState<ViewState>("HOME");
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [isExamMode, setIsExamMode] = useState(false);
-
+const navigate = useNavigate();
   const [quizState, setQuizState] = useState<QuizState>({
     answers: [],
     isSubmitted: false,
@@ -262,6 +336,7 @@ export default function App() {
   /* ================= TIMER ================= */
   const EXAM_DURATION = 60 * 60; // 60 minutes
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (timeLeft === null) return;
@@ -311,7 +386,7 @@ export default function App() {
       isSubmitted: false,
       score: 0,
     });
-    setView("QUIZ");
+    navigate("/quiz");
   };
   const startChapterExam = (chapter: Chapter) => {
     if (!chapter.exam) return;
@@ -327,7 +402,7 @@ export default function App() {
     });
 
     setTimeLeft(EXAM_DURATION);
-    setView("QUIZ");
+    navigate("/quiz");
   };
 
   const handleGenerateAI = async () => {
@@ -375,7 +450,7 @@ export default function App() {
     const isFinalExam = isExamMode;
 
     setQuizState({ ...quizState, isSubmitted: true, score });
-    setView("RESULTS");
+    navigate("/results");
 
     // ✅ لفوق فورًا بعد السبمت
     window.scrollTo({
@@ -419,7 +494,7 @@ export default function App() {
 
           <div className="flex items-center gap-6">
             <Button
-              onClick={() => setView("CHAPTERS")}
+              onClick={() => navigate("/chapters")}
               className="px-10 rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
             >
               Get Started <ArrowRight className="w-5 h-5" />
@@ -462,6 +537,14 @@ export default function App() {
       </div>
     </section>
   );
+const chapterNumbers = [
+  "/assets/one.png",
+  "/assets/two.png",
+  "/assets/three.png",
+  "/assets/four.png",
+  "/assets/five.png",
+  "/assets/logo.png",
+];
 
   const renderChapters = () => (
     <section
@@ -488,8 +571,7 @@ export default function App() {
                   if (chapter.id === "GenAI-Mock-exam") {
                     startChapterExam(chapter); // ✅ Exam Mode + Timer
                   } else {
-                    setActiveChapter(chapter);
-                    setView("CHAPTER_OPTIONS");
+navigate(`/chapters/${chapter.id}`);
                   }
                 }}
                 className={`
@@ -513,9 +595,17 @@ export default function App() {
                             `}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow">
-                    <Bot className="w-5 h-5 text-indigo-600" />
-                  </div>
+<div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow">
+  {index < 6  ? (
+    <img
+      src={chapterNumbers[index]}
+      alt={`Chapter ${index + 1}`}
+      className="w-6 h-6 object-contain"
+    />
+  ) : (
+    <Bot className="w-5 h-5 text-indigo-600" />
+  )}
+</div>
 
                   <div>
                     <h4 className="font-semibold text-slate-800">
@@ -561,64 +651,6 @@ export default function App() {
       </div>
     </section>
   );
-
-  const renderChapterOptions = () => {
-    if (!activeChapter) return null;
-
-    return (
-      <section
-        className="min-h-screen bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/assets/backGround.png')",
-        }}
-      >
-        <div className="max-w-5xl mx-auto px-6 pt-20 pb-24">
-          <h2 className="text-4xl font-bold text-slate-900 mb-3 text-center">
-            {activeChapter.title}
-          </h2>
-
-          <p className="text-slate-500 text-center mb-16">
-            Choose how you want to start this chapter
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-10">
-            {/* Practice Card */}
-            <Card
-              hoverable
-              onClick={() => startChapter(activeChapter)}
-              className="text-center py-16"
-            >
-              <Bot className="w-12 h-12 text-indigo-600 mx-auto mb-6" />
-              <h3 className="text-2xl font-bold mb-3">Practice Mode</h3>
-              <p className="text-slate-500 mb-8">
-                Learn step by step with practice questions.
-              </p>
-
-              <Button className="w-full justify-center">Start Practice</Button>
-            </Card>
-
-            {/* Exam Card */}
-            {activeChapter.exam && (
-              <Card
-                hoverable
-                onClick={() => startChapterExam(activeChapter)}
-                className="text-center py-16"
-              >
-                <Award className="w-12 h-12 text-indigo-600 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold mb-3">Exam Mode</h3>
-                <p className="text-slate-500 mb-8">
-                  Simulate the real certification exam.
-                </p>
-
-                <Button className="w-full justify-center">Start Exam</Button>
-              </Card>
-            )}
-          </div>
-        </div>
-      </section>
-    );
-  };
-
   const OptionCard = ({
     text,
     selected,
@@ -866,7 +898,7 @@ export default function App() {
       setTimeLeft(EXAM_DURATION);
     }
 
-    setView("QUIZ");
+    navigate("/quiz");
   };
 
   const renderResults = () => {
@@ -898,7 +930,7 @@ export default function App() {
                   <RotateCcw className="w-4 h-4" />
                   Retry
                 </Button>
-                <Button onClick={() => setView("CHAPTERS")}>
+                <Button onClick={() => navigate("/chapters")}>
                   Back to Chapters
                 </Button>
               </div>
@@ -999,8 +1031,8 @@ const confirmExit = () => {
   setTimeLeft(null);
   setIsExamMode(false);
 
-  if (pendingNavigation === "HOME") setView("HOME");
-  if (pendingNavigation === "CHAPTERS") setView("CHAPTERS");
+  if (pendingNavigation === "HOME") navigate("/");
+  if (pendingNavigation === "CHAPTERS") navigate("/chapters");
 
   setPendingNavigation(null);
 };
@@ -1019,7 +1051,7 @@ const cancelExit = () => {
       setPendingNavigation("HOME");
       setShowExitConfirm(true);
     } else {
-      setView("HOME");
+      navigate("/");
     }
   }}
   onChapters={() => {
@@ -1027,7 +1059,7 @@ const cancelExit = () => {
       setPendingNavigation("CHAPTERS");
       setShowExitConfirm(true);
     } else {
-      setView("CHAPTERS");
+      navigate("/chapters");
     }
   }}
   onGenerate={() => {
@@ -1042,13 +1074,24 @@ const cancelExit = () => {
 )}
 
       {showCelebration && <Celebration />}
-      <main className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {view === "HOME" && renderHome()}
-        {view === "CHAPTERS" && renderChapters()}
-        {view === "CHAPTER_OPTIONS" && renderChapterOptions()}
-        {view === "QUIZ" && renderQuiz()}
-        {view === "RESULTS" && renderResults()}
-      </main>
+     <main className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <Routes>
+    <Route path="/" element={renderHome()} />
+    <Route path="/chapters" element={renderChapters()} />
+    <Route path="/quiz" element={renderQuiz()} />
+    <Route path="/results" element={renderResults()} />
+    <Route path="*" element={<Navigate to="/" />} />
+    <Route
+  path="/chapters/:chapterId"
+  element={<ChapterOptionsPage
+      startChapter={startChapter}
+      startChapterExam={startChapterExam}
+    />
+  }
+/>
+
+  </Routes>
+</main>
       <Footer />
     </div>
   );

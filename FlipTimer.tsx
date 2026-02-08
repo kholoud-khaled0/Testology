@@ -42,7 +42,7 @@ const FlipTimer = ({ timeLeft }: FlipTimerProps) => {
   const seconds = (timeLeft % 60).toString().padStart(2, "0");
 
   return (
-    <div className="fixed left-6 top-28 z-50">
+    <div className="fixed right-6 top-28 z-50">
       <div className="flex items-center gap-1">
         <FlipDigit value={minutes[0]} />
         <FlipDigit value={minutes[1]} />

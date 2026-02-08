@@ -10,6 +10,7 @@ export interface Question {
 
 
 export interface Chapter {
+  [x: string]: any;
   id: string;
   title: string;
   description: string;

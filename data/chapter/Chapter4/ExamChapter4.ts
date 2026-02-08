@@ -2,7 +2,7 @@ import { Chapter } from "../types";
 
 export const CHAPTER_4_FINAL_EXAM: Chapter = {
   id: "genai-4-exam",
-  title: "ISTQB CT-GenAI – Chapter 4 Final Mock Exam",
+  title: " Chapter 4 Final Mock Exam",
   description: "40 Questions • 90 Minutes • LLM-Powered Test Infrastructure for Software Testing",
   icon: "Network",
   questions: [

@@ -2,7 +2,7 @@ import { Chapter } from "../types";
 
 export const CHAPTER_5_PRACTICE: Chapter = {
   id: "genai-5-practice",
-  title: "ISTQB CT-GenAI – Chapter 5 Practice",
+  title: "Deploying and Integrating Generative AI in Test Organizations",
   description: "Deploying and Integrating Generative AI in Test Organizations",
   icon: "Briefcase",
   questions: [
