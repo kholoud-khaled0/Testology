@@ -18,7 +18,7 @@ import {
   Award,
 } from "lucide-react";
 import { Question, Chapter, QuizState, ViewState, AIConfig } from "./types";
-
+import FlipTimer from "./FlipTimer";
 const Button: React.FC<{
   children: React.ReactNode;
   onClick?: () => void;
@@ -94,43 +94,36 @@ const Header: React.FC<{
         />
         <span className="font-bold text-base">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-            <span className="text-2xl font-bold text-black">TestologyAI</span>
+           <span className="text-xl font-semibold text-black">TestologyAI</span>
           </span>
         </span>
       </div>
 
       {/* Nav */}
-      <nav className="hidden md:flex items-center gap-6 text-sm">
-        <span
-          onClick={onHome}
-          className={`cursor-pointer text-2xl font-bold ${
-            currentView === "HOME"
-              ? "text-indigo-600 font-medium"
-              : "text-slate-500 hover:text-indigo-600"
-          }`}
-        >
-          Home
-        </span>
+      <nav className="hidden md:flex items-center gap-12 text-sm">
+  <span
+    onClick={onHome}
+    className={`cursor-pointer text-lg font-semibold ${
+      currentView === "HOME"
+        ? "text-indigo-600 font-medium"
+        : "text-slate-500 hover:text-indigo-600"
+    }`}
+  >
+    Home
+  </span>
 
-        <span
-          onClick={onChapters}
-          className={`cursor-pointer text-2xl font-bold ${
-            currentView === "CHAPTERS"
-              ? "text-indigo-600 font-medium"
-              : "text-slate-500 hover:text-indigo-600"
-          }`}
-        >
-          Chapters
-        </span>
+  <span
+    onClick={onChapters}
+    className={`cursor-pointer text-lg font-semibold ${
+      currentView === "CHAPTERS"
+        ? "text-indigo-600 font-medium"
+        : "text-slate-500 hover:text-indigo-600"
+    }`}
+  >
+    Chapters
+  </span>
+</nav>
 
-        {/*<span
-          onClick={onGenerate}
-          className="cursor-not-allowed text-slate-400"
-          title="Coming Soon"
-        >
-          Generate Questions
-        </span>*/}
-      </nav>
 
       {/* Avatar */}
       <img
@@ -174,7 +167,7 @@ const Footer = () => {
           </a>
 
           <a
-            href="https://chat.whatsapp.com/HpPYIO30HFc0q1wn5J9HQJ"
+            href="https://chat.whatsapp.com/DkquGZvYaVl6LhhWE7CznY"
             target="_blank"
             rel="noopener noreferrer"
             className="text-slate-500 hover:text-green-600 transition"
@@ -263,6 +256,8 @@ export default function App() {
 
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<null | "HOME" | "CHAPTERS">(null);
 
   /* ================= TIMER ================= */
   const EXAM_DURATION = 60 * 60; // 60 minutes
@@ -744,69 +739,7 @@ export default function App() {
   {
     /* ===== END TIMER ===== */
   }
-  /* ================= FIXED EXAM TIMER (LEFT) ================= */
-  const ExamTimer = ({
-    timeLeft,
-    totalTime,
-  }: {
-    timeLeft: number;
-    totalTime: number;
-  }) => {
-    const radius = 44;
-    const circumference = 2 * Math.PI * radius;
-    const progress = timeLeft / totalTime;
-    const offset = circumference * (1 - progress);
-
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = (timeLeft % 60).toString().padStart(2, "0");
-
-    // 🎨 color logic
-    const strokeColor =
-      progress > 0.5
-        ? "#22c55e" // green
-        : progress > 0.25
-        ? "#facc15" // yellow
-        : "#ef4444"; // red
-
-    return (
-      <div className="fixed left-6 top-28 z-50">
-        <div className="bg-white rounded-2xl shadow-xl px-6 py-6 w-[140px] h-[160px] flex flex-col items-center justify-center">
-          {/* Circle */}
-          <svg width="110" height="110">
-            <circle
-              cx="55"
-              cy="55"
-              r={radius}
-              stroke="#E5E7EB"
-              strokeWidth="8"
-              fill="none"
-            />
-            <circle
-              cx="55"
-              cy="55"
-              r={radius}
-              stroke={strokeColor}
-              strokeWidth="8"
-              fill="none"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-              transform="rotate(-90 55 55)"
-              className="transition-all duration-1000 ease-linear"
-            />
-          </svg>
-
-          {/* Time text (جوه البوكس) */}
-          <div className="absolute text-center">
-            <div className="text-lg font-bold text-slate-800">
-              {minutes}:{seconds}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
+  
   /* ================= QUIZ RENDER ================= */
   const renderQuiz = () => {
     const isFinalExam = activeChapter?.id.includes("exam") ?? false;
@@ -816,10 +749,10 @@ export default function App() {
         className="min-h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
         style={{ backgroundImage: "url('/assets/backGround.png')" }}
       >
-        {/* ===== FIXED TIMER (EXAM ONLY) ===== */}
-        {isFinalExam && timeLeft !== null && (
-          <ExamTimer timeLeft={timeLeft} totalTime={EXAM_DURATION} />
-        )}
+       
+{isFinalExam && timeLeft !== null && (
+  <FlipTimer timeLeft={timeLeft} />
+)}
 
         {/* ===== FLOATING HALF ROBOT ===== */}
         <img
@@ -1008,17 +941,105 @@ export default function App() {
       </section>
     );
   };
+const ExitConfirmModal = ({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+}) => (
+  <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center">
+    <div className="bg-white rounded-3xl w-[440px] p-8 shadow-2xl border border-slate-100">
+      
+      {/* Icon */}
+      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+        <XCircle className="w-7 h-7 text-red-500" />
+      </div>
+
+      {/* Title */}
+      <h3 className="text-xl font-semibold text-slate-800 text-center mb-2">
+        Leave Quiz?
+      </h3>
+
+      {/* Description */}
+      <p className="text-sm text-slate-600 text-center leading-relaxed mb-8">
+        You’re about to leave the current session.<br />
+        Your progress and selected answers will be
+        <span className="font-semibold text-slate-800"> permanently discarded</span>.
+      </p>
+
+      {/* Actions */}
+      <div className="flex gap-4">
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={onCancel}
+        >
+          Stay & Continue
+        </Button>
+
+        <Button
+          className="w-full bg-red-600 hover:bg-red-700 text-white"
+          onClick={onConfirm}
+        >
+          Exit Quiz
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
+const confirmExit = () => {
+  setShowExitConfirm(false);
+
+  // reset quiz
+  setActiveChapter(null);
+  setCurrentQuestions([]);
+  setQuizState({ answers: [], isSubmitted: false, score: 0 });
+  setTimeLeft(null);
+  setIsExamMode(false);
+
+  if (pendingNavigation === "HOME") setView("HOME");
+  if (pendingNavigation === "CHAPTERS") setView("CHAPTERS");
+
+  setPendingNavigation(null);
+};
+
+const cancelExit = () => {
+  setShowExitConfirm(false);
+  setPendingNavigation(null);
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30">
-      <Header
-        currentView={view}
-        onHome={() => setView("HOME")}
-        onChapters={() => setView("CHAPTERS")}
-        onGenerate={() => {
-          alert("Generate Questions page coming soon 🚀");
-        }}
-      />
+     <Header
+  currentView={view}
+  onHome={() => {
+    if (view === "QUIZ") {
+      setPendingNavigation("HOME");
+      setShowExitConfirm(true);
+    } else {
+      setView("HOME");
+    }
+  }}
+  onChapters={() => {
+    if (view === "QUIZ") {
+      setPendingNavigation("CHAPTERS");
+      setShowExitConfirm(true);
+    } else {
+      setView("CHAPTERS");
+    }
+  }}
+  onGenerate={() => {
+    alert("Generate Questions page coming soon 🚀");
+  }}
+/>
+{showExitConfirm && (
+  <ExitConfirmModal
+    onConfirm={confirmExit}
+    onCancel={cancelExit}
+  />
+)}
 
       {showCelebration && <Celebration />}
       <main className="animate-in fade-in slide-in-from-bottom-4 duration-500">
