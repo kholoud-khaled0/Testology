@@ -74,7 +74,7 @@ export const CHAPTER_5_PRACTICE: Chapter = {
       text: "What role does data quality play in a successful GenAI strategy?",
       options: [
         "Only relevant for training foundation models.",
-        "Essential for trustworthy results.",
+        "High-quality, accurate input data is essential for achieving trustworthy results.",
         "Minimizes licensing fees.",
         "Bypasses security audits.",
       ],
