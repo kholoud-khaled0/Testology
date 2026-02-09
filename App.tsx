@@ -3,6 +3,7 @@ import { PRACTICE_CHAPTERS } from "./data/chapter/chapters";
 import { FaYoutube, FaLinkedin, FaFacebook, FaWhatsapp } from "react-icons/fa";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   BrainCircuit,
   MessageSquareText,
@@ -145,7 +146,7 @@ const Header: React.FC<{
 );
 const Footer = () => {
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-center">
         {/* Icons */}
         <div className="flex items-center gap-8">
@@ -316,7 +317,8 @@ export default function App() {
   const [view, setView] = useState<ViewState>("HOME");
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [isExamMode, setIsExamMode] = useState(false);
-const navigate = useNavigate();
+  const QUIZ_STORAGE_KEY = "testology_quiz_state";
+  const navigate = useNavigate();
   const [quizState, setQuizState] = useState<QuizState>({
     answers: [],
     isSubmitted: false,
@@ -332,6 +334,10 @@ const navigate = useNavigate();
   const [showCelebration, setShowCelebration] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<null | "HOME" | "CHAPTERS">(null);
+const location = useLocation();
+
+  const isInQuiz =
+  location.pathname === "/quiz" 
 
   /* ================= TIMER ================= */
   const EXAM_DURATION = 60 * 60; // 60 minutes
@@ -359,6 +365,90 @@ const navigate = useNavigate();
       behavior: "smooth",
     });
   }, [view]);
+  useEffect(() => {
+  if (!isInQuiz) return;
+
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = "";
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [isInQuiz]);
+useEffect(() => {
+  if (!isInQuiz) return;
+
+  const handlePopState = () => {
+    setPendingNavigation("HOME");
+    setShowExitConfirm(true);
+
+    // نرجّع المستخدم مكانه
+    navigate(location.pathname, { replace: true });
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [isInQuiz, location.pathname]);
+useEffect(() => {
+  if (!activeChapter || currentQuestions.length === 0) return;
+
+  sessionStorage.setItem(
+    QUIZ_STORAGE_KEY,
+    JSON.stringify({
+      activeChapter,
+      currentQuestions,
+      quizState,
+      isExamMode,
+      timeLeft,
+    })
+  );
+}, [activeChapter, currentQuestions, quizState, isExamMode, timeLeft]);
+useEffect(() => {
+  const saved = sessionStorage.getItem(QUIZ_STORAGE_KEY);
+  if (!saved) return;
+
+  const data = JSON.parse(saved);
+
+  setActiveChapter(data.activeChapter);
+  setCurrentQuestions(data.currentQuestions);
+  setQuizState(data.quizState);
+  setIsExamMode(data.isExamMode);
+  setTimeLeft(data.timeLeft ?? null);
+
+  // لو كان في Quiz قبل الريلود
+  if (location.pathname === "/quiz" || location.pathname === "/results") {
+    navigate(location.pathname, { replace: true });
+  }
+}, []);
+
+
+  const confirmExit = () => {
+  setShowExitConfirm(false);
+
+  setActiveChapter(null);
+  setCurrentQuestions([]);
+  setQuizState({ answers: [], isSubmitted: false, score: 0 });
+  setTimeLeft(null);
+  setIsExamMode(false);
+
+  if (pendingNavigation === "HOME") navigate("/");
+  if (pendingNavigation === "CHAPTERS") navigate("/chapters");
+
+  setPendingNavigation(null);
+};
+
+const cancelExit = () => {
+  setShowExitConfirm(false);
+  setPendingNavigation(null);
+};
+
 
   // Icon mapping
   const getIcon = (iconName: string) => {
@@ -386,7 +476,8 @@ const navigate = useNavigate();
       isSubmitted: false,
       score: 0,
     });
-    navigate("/quiz");
+    navigate("/quiz", { replace: false });
+window.history.pushState(null, "", window.location.href);
   };
   const startChapterExam = (chapter: Chapter) => {
     if (!chapter.exam) return;
@@ -402,7 +493,8 @@ const navigate = useNavigate();
     });
 
     setTimeLeft(EXAM_DURATION);
-    navigate("/quiz");
+    navigate("/quiz", { replace: false });
+window.history.pushState(null, "", window.location.href);
   };
 
   const handleGenerateAI = async () => {
@@ -644,7 +736,7 @@ navigate(`/chapters/${chapter.id}`);
             <img
               src="/assets/robot.png"
               alt="AI Robot"
-              className="w-[920px] max-w-none animate-float drop-shadow-2xl relative z-10"
+              className="w-[920px] max-w-none animate-float drop-shadow-2xl fixed z-10"
             />
           </div>
         </div>
@@ -685,16 +777,7 @@ navigate(`/chapters/${chapter.id}`);
       </div>
     </div>
   );
-  {
-    activeChapter?.id.includes("exam") && timeLeft !== null && (
-      <div className="mb-6 flex justify-center">
-        <div className="px-6 py-3 rounded-full bg-red-50 text-red-700 font-bold text-sm shadow">
-          ⏱️ Time Left: {Math.floor(timeLeft / 60)}:
-          {(timeLeft % 60).toString().padStart(2, "0")}
-        </div>
-      </div>
-    );
-  }
+
 
   const QuizHeader = ({
     title,
@@ -737,41 +820,8 @@ navigate(`/chapters/${chapter.id}`);
       </div>
     </Card>
   );
-  {
-    /* ===== FINAL EXAM TIMER ===== */
-  }
-  {
-    activeChapter?.id.includes("exam") && timeLeft !== null && (
-      <div className="mb-8">
-        <div className="flex justify-between items-center text-sm text-slate-600 mb-2">
-          <span className="font-medium">Time Remaining</span>
-          <span className="font-bold text-red-600">
-            {Math.floor(timeLeft / 60)}:
-            {(timeLeft % 60).toString().padStart(2, "0")}
-          </span>
-        </div>
-
-        <div className="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
-          <div
-            className="h-full transition-all duration-1000"
-            style={{
-              width: `${(timeLeft / EXAM_DURATION) * 100}%`,
-              background:
-                timeLeft / EXAM_DURATION > 0.5
-                  ? "linear-gradient(to right, #22c55e, #84cc16)"
-                  : timeLeft / EXAM_DURATION > 0.25
-                  ? "linear-gradient(to right, #facc15, #f97316)"
-                  : "linear-gradient(to right, #ef4444, #b91c1c)",
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-  {
-    /* ===== END TIMER ===== */
-  }
   
+
   /* ================= QUIZ RENDER ================= */
   const renderQuiz = () => {
     const isFinalExam = activeChapter?.id.includes("exam") ?? false;
@@ -1021,57 +1071,36 @@ const ExitConfirmModal = ({
   </div>
 );
 
-const confirmExit = () => {
-  setShowExitConfirm(false);
-
-  // reset quiz
-  setActiveChapter(null);
-  setCurrentQuestions([]);
-  setQuizState({ answers: [], isSubmitted: false, score: 0 });
-  setTimeLeft(null);
-  setIsExamMode(false);
-
-  if (pendingNavigation === "HOME") navigate("/");
-  if (pendingNavigation === "CHAPTERS") navigate("/chapters");
-
-  setPendingNavigation(null);
-};
-
-const cancelExit = () => {
-  setShowExitConfirm(false);
-  setPendingNavigation(null);
-};
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30">
      <Header
-  currentView={view}
-  onHome={() => {
-    if (view === "QUIZ") {
-      setPendingNavigation("HOME");
-      setShowExitConfirm(true);
-    } else {
-      navigate("/");
-    }
-  }}
-  onChapters={() => {
-    if (view === "QUIZ") {
-      setPendingNavigation("CHAPTERS");
-      setShowExitConfirm(true);
-    } else {
-      navigate("/chapters");
-    }
-  }}
-  onGenerate={() => {
-    alert("Generate Questions page coming soon 🚀");
-  }}
-/>
+        currentView={view}
+        onHome={() => {
+          if (isInQuiz) {
+            setPendingNavigation("HOME");
+            setShowExitConfirm(true);
+          } else {
+            navigate("/");
+          }
+        } }
+        onChapters={() => {
+          if (isInQuiz) {
+            setPendingNavigation("CHAPTERS");
+            setShowExitConfirm(true);
+          } else {
+            navigate("/chapters");
+          }
+        } } onGenerate={function (): void {
+          throw new Error("Function not implemented.");
+        } }/>
+
 {showExitConfirm && (
   <ExitConfirmModal
     onConfirm={confirmExit}
     onCancel={cancelExit}
   />
 )}
+
 
       {showCelebration && <Celebration />}
      <main className="animate-in fade-in slide-in-from-bottom-4 duration-500">
